@@ -30,7 +30,11 @@ class UserController extends Controller
         if($user = User::where('email',$request->email)->first()){
             if(Hash::check($request->password,$user->password)){
                 $this->AfterLogin($user);
-                return redirect()->route('frontend.home'); 
+                if(session()->get('userRole') == 'admin'){
+                    return redirect()->route('admin.dashbord');
+                } else{
+                    return redirect()->route('frontend.home');
+                }
             }
             else{
                 //  password not matched
@@ -44,6 +48,7 @@ class UserController extends Controller
     private function AfterLogin($user){
         Session::put('loggedUser', $user->id);
         Session::put('userRole', $user->role);
+        // dd(session()->all());
     }
 
     public function logout(){
